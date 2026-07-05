@@ -25,6 +25,13 @@ if (process.env.NODE_ENV !== 'test') {
   app.use(morgan('dev'));
 }
 
+app.get("/", (req, res) => {
+  res.json({
+    status: "ok",
+    message: "AK Computer Solutions API",
+  });
+});
+
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'AK Computer Solutions API is running' });
 });
