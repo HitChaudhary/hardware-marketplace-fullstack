@@ -2,7 +2,7 @@
 // Keeps base URL, JSON handling, auth headers, and error shape in one place
 // so contexts/pages don't repeat fetch() boilerplate.
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_BASE = import.meta.env.VITE_API_URL ;
 
 const CUSTOMER_TOKEN_KEY = 'ak-customer-token';
 const ADMIN_TOKEN_KEY = 'ak-admin-token';
