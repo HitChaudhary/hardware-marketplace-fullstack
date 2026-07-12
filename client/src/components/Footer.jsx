@@ -33,6 +33,10 @@ export default function Footer() {
           padding: 24px;
           border-top: 1px solid rgba(0, 0, 0, 0.05);
         }
+          .footer-logo{
+            width: 100px;
+            height: auto;
+          }
 
         /* Mobile Adjustments */
         @media (max-width: 768px) {
