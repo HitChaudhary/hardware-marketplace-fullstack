@@ -28,7 +28,7 @@ MONGO_URI=mongodb://127.0.0.1:27017/ak-computer-solutions   # or your Atlas URI
 JWT_SECRET=replace-with-a-long-random-string
 JWT_EXPIRES_IN=7d
 ADMIN_SEED_USERNAME=admin
-ADMIN_SEED_PASSWORD=admin password
+ADMIN_SEED_PASSWORD=akcomputers2026
 CLIENT_ORIGIN=http://localhost:5173
 ```
 

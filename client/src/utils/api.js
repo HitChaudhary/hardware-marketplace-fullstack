@@ -2,27 +2,9 @@
 // Keeps base URL, JSON handling, auth headers, and error shape in one place
 // so contexts/pages don't repeat fetch() boilerplate.
 
-const API_BASE = import.meta.env.VITE_API_URL ;
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
-const CUSTOMER_TOKEN_KEY = 'ak-customer-token';
 const ADMIN_TOKEN_KEY = 'ak-admin-token';
-
-export function getCustomerToken() {
-  try {
-    return localStorage.getItem(CUSTOMER_TOKEN_KEY);
-  } catch {
-    return null;
-  }
-}
-
-export function setCustomerToken(token) {
-  try {
-    if (token) localStorage.setItem(CUSTOMER_TOKEN_KEY, token);
-    else localStorage.removeItem(CUSTOMER_TOKEN_KEY);
-  } catch {
-    /* ignore */
-  }
-}
 
 export function getAdminToken() {
   try {
@@ -42,9 +24,9 @@ export function setAdminToken(token) {
 }
 
 /**
- * @param {string} path - e.g. '/products' or '/auth/login'
+ * @param {string} path - e.g. '/products' or '/admin/auth/login'
  * @param {object} options
- * @param {'customer'|'admin'|null} options.authAs - which token to attach, if any
+ * @param {'admin'|null} options.authAs - which token to attach, if any
  */
 export async function apiFetch(path, { method = 'GET', body, authAs = null, headers = {} } = {}) {
   // 1. Check if the incoming request payload is multi-part image binary data
@@ -56,10 +38,7 @@ export async function apiFetch(path, { method = 'GET', body, authAs = null, head
     ...headers 
   };
 
-  if (authAs === 'customer') {
-    const token = getCustomerToken();
-    if (token) finalHeaders.Authorization = `Bearer ${token}`;
-  } else if (authAs === 'admin') {
+  if (authAs === 'admin') {
     const token = getAdminToken();
     if (token) finalHeaders.Authorization = `Bearer ${token}`;
   }

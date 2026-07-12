@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { products } from '../data/products';
+import { useProductStore } from './ProductStoreContext';
 
 const CompareContext = createContext(null);
 const STORAGE_KEY = 'ak-compare';
@@ -16,6 +16,7 @@ function loadInitial() {
 }
 
 export function CompareProvider({ children }) {
+  const { products } = useProductStore();
   const [ids, setIds] = useState(loadInitial);
 
   useEffect(() => {
@@ -39,7 +40,7 @@ export function CompareProvider({ children }) {
   const toggleCompare = (id) => (isComparing(id) ? removeFromCompare(id) : addToCompare(id));
   const clearCompare = () => setIds([]);
 
-  const compareProducts = ids.map((id) => products.find((p) => p.id === id)).filter(Boolean);
+  const compareProducts = ids.map((id) => products.find((p) => (p._id || p.id) === id)).filter(Boolean);
 
   return (
     <CompareContext.Provider

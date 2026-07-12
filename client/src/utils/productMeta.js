@@ -126,10 +126,26 @@ const DESC_TEMPLATES = {
   'cables-accessories': (p) => `${p.brand} ${p.name} is a small but essential accessory built to be durable and fully compatible with your existing setup.`,
 };
 
+// Maps the raw lowercase keys stored in product.specs (Mongo) to the
+// display labels used across the product page and compare table.
+const SPEC_LABELS = {
+  processor: 'Processor',
+  ram: 'RAM',
+  storage: 'Storage',
+  graphics: 'Graphics',
+  display: 'Display',
+  battery: 'Battery',
+  weight: 'Weight',
+  cooler: 'Cooler',
+};
+
 export function getSpecs(product) {
-  const fn = SPEC_TEMPLATES[product.category];
-  if (!fn) return {};
-  return fn(product);
+  const raw = product.specs || {};
+  const out = {};
+  Object.keys(SPEC_LABELS).forEach((key) => {
+    if (raw[key]) out[SPEC_LABELS[key]] = raw[key];
+  });
+  return out;
 }
 
 export function getFeatures(product) {

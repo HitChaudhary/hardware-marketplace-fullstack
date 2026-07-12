@@ -12,7 +12,7 @@ const ROWS = [
   { label: 'Weight', key: 'Weight' },
 ];
 
-export default function CompareTable({ products, onRemove, onAddToCart }) {
+export default function CompareTable({ products, onRemove }) {
   if (products.length === 0) return null;
 
   const specsByProduct = products.map((p) => getSpecs(p));
@@ -23,17 +23,20 @@ export default function CompareTable({ products, onRemove, onAddToCart }) {
         <thead>
           <tr>
             <th></th>
-            {products.map((p, i) => (
-              <th key={p.id}>
-                <button className="compare-remove" onClick={() => onRemove(p.id)} aria-label="Remove from compare">
-                  ✕
-                </button>
-                <Link to={`/product/${p.id}`}>
-                  <img src={p.image} alt={p.name} />
-                  <div className="compare-pname">{p.name}</div>
-                </Link>
-              </th>
-            ))}
+            {products.map((p) => {
+              const pid = p._id || p.id;
+              return (
+                <th key={pid}>
+                  <button className="compare-remove" onClick={() => onRemove(pid)} aria-label="Remove from compare">
+                    ✕
+                  </button>
+                  <Link to={`/product/${p.slug || pid}`}>
+                    <img src={p.image} alt={p.name} />
+                    <div className="compare-pname">{p.name}</div>
+                  </Link>
+                </th>
+              );
+            })}
           </tr>
         </thead>
         <tbody>
@@ -41,24 +44,14 @@ export default function CompareTable({ products, onRemove, onAddToCart }) {
             <tr key={row.label}>
               <th>{row.label}</th>
               {specsByProduct.map((specs, i) => (
-                <td key={products[i].id}>{specs[row.key] || '—'}</td>
+                <td key={products[i]._id || products[i].id}>{specs[row.key] || '—'}</td>
               ))}
             </tr>
           ))}
           <tr>
             <th>Price</th>
             {products.map((p) => (
-              <td key={p.id} className="compare-price">{formatPrice(p.price)}</td>
-            ))}
-          </tr>
-          <tr>
-            <th></th>
-            {products.map((p) => (
-              <td key={p.id}>
-                <button className="padd" onClick={() => onAddToCart(p)}>
-                  Add to Cart
-                </button>
-              </td>
+              <td key={p._id || p.id} className="compare-price">{formatPrice(p.price)}</td>
             ))}
           </tr>
         </tbody>

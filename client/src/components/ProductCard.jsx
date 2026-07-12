@@ -1,6 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { useCart } from '../context/CartContext';
-import { useWishlist } from '../context/WishlistContext';
+import { Link } from 'react-router-dom';
 import { useCompare } from '../context/CompareContext';
 import { useToast } from '../context/ToastContext';
 import RatingStars from './RatingStars';
@@ -17,30 +15,14 @@ const formatPrice = (n) => `₹${n.toLocaleString('en-IN')}`;
 
 export default function ProductCard({ product }) {
   const { brand, name, price, oldPrice, badge, image } = product;
-  const { addToCart } = useCart();
-  const { isWishlisted, toggleWishlist } = useWishlist();
   const { isComparing, toggleCompare } = useCompare();
   const { showToast } = useToast();
-  const navigate = useNavigate();
 
-  // Safely extract identifying parameters favoring standard MongoDB database setups
   const productId = product._id || product.id;
   const routeTarget = product.slug || productId;
 
-  const wishlisted = isWishlisted(productId);
   const comparing = isComparing(productId);
   const stock = getStock(product);
-
-  const handleAddToCart = () => {
-    addToCart(product);
-    showToast(`${name} added to cart`, 'success');
-  };
-
-  const handleWishlist = (e) => {
-    e.preventDefault();
-    toggleWishlist(productId);
-    showToast(wishlisted ? 'Removed from wishlist' : 'Added to wishlist', 'info');
-  };
 
   const handleCompare = (e) => {
     e.preventDefault();
@@ -57,15 +39,6 @@ export default function ProductCard({ product }) {
           <span className={`pbadge ${badge}`}>{BADGE_LABELS[badge] || badge}</span>
         )}
         <div className="pcard-quick-actions">
-          <button
-            type="button"
-            className={`pquick ${wishlisted ? 'active' : ''}`}
-            onClick={handleWishlist}
-            aria-label="Toggle wishlist"
-            title="Wishlist"
-          >
-            {wishlisted ? '♥' : '♡'}
-          </button>
           <button
             type="button"
             className={`pquick ${comparing ? 'active' : ''}`}
@@ -91,19 +64,9 @@ export default function ProductCard({ product }) {
             <span className="pnew">{formatPrice(price)}</span>
             {oldPrice && <span className="pold">{formatPrice(oldPrice)}</span>}
           </div>
-          {stock === 'out' ? (
-            <button
-              type="button"
-              className="padd"
-              onClick={() => navigate(`/inquiry?product=${productId}`)}
-            >
-              Inquire Anyway
-            </button>
-          ) : (
-            <button type="button" className="padd" onClick={handleAddToCart}>
-              {product.category === 'custom-pc-builds' ? 'Configure Build' : 'Add to cart'}
-            </button>
-          )}
+          <Link to={`/product/${routeTarget}`} className="padd" style={{ textDecoration: 'none', textAlign: 'center' }}>
+            {stock === 'out' ? 'Out of Stock' : 'View'}
+          </Link>
         </div>
       </div>
     </div>

@@ -2,21 +2,20 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Breadcrumb from '../components/Breadcrumb';
 import RatingStars from '../components/RatingStars';
-import { useCart } from '../context/CartContext';
+import { useCompare } from '../context/CompareContext';
 import { useToast } from '../context/ToastContext';
 import { getRating, getReviewCount } from '../utils/productMeta';
 
 const formatPrice = (n) => `₹${n?.toLocaleString('en-IN')}`;
 
 export default function ProductDetailsPage() {
-  const { idOrSlug } = useParams(); 
+  const { idOrSlug } = useParams();
   const navigate = useNavigate();
-  const { addToCart } = useCart();
+  const { isComparing, toggleCompare } = useCompare();
   const { showToast } = useToast();
-  
+
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [qty, setQty] = useState(1);
 
   useEffect(() => {
     async function fetchProductDetails() {
@@ -25,14 +24,14 @@ export default function ProductDetailsPage() {
         const res = await fetch(`/api/products/${idOrSlug}`);
         if (res.ok) {
           const payload = await res.json();
-          
+
           if (payload && typeof payload === 'object') {
             if (payload._id || payload.id) {
-              setProduct(payload); 
+              setProduct(payload);
             } else if (payload.product && typeof payload.product === 'object') {
-              setProduct(payload.product); 
+              setProduct(payload.product);
             } else if (payload.data && typeof payload.data === 'object') {
-              setProduct(payload.data); 
+              setProduct(payload.data);
             } else {
               console.error("Product fields not found in API response structure:", payload);
             }
@@ -45,7 +44,7 @@ export default function ProductDetailsPage() {
       }
     }
     fetchProductDetails();
-  }, [idOrSlug]);       
+  }, [idOrSlug]);
 
   if (loading) {
     return (
@@ -77,33 +76,32 @@ export default function ProductDetailsPage() {
 
   const productId = product._id || product.id;
   const isOutOfStock = product.inStock === false || product.stockQty <= 0;
+  const comparing = isComparing(productId);
 
   // Derive if there are any readable specs available inside the mixed object block
   const hasSpecs = product.specs && Object.keys(product.specs).some(key => product.specs[key]);
 
-  const handleActionClick = () => {
-    if (isOutOfStock) {
-      navigate(`/inquiry?product=${productId}`);
-    } else if (product.isPcBuilderTemplate || product.category === 'custom-pc-builds') {
-      navigate(`/build-pc?template=${productId}`);
+  const handleCompareClick = () => {
+    const result = toggleCompare(productId);
+    if (result && result.ok === false) {
+      showToast(result.reason, 'error');
     } else {
-      addToCart(product, qty);
-      showToast(`${product.name} added to cart!`, 'success');
+      showToast(comparing ? 'Removed from compare' : 'Added to compare', 'success');
     }
   };
 
   return (
     <main className="sec a3" style={{ maxWidth: '1200px', margin: '0 auto', padding: '20px' }}>
       <Breadcrumb items={[{ label: 'Products', to: '/' }, { label: product.name }]} />
-      
+
       <div className="build-pc-layout" style={{ display: 'flex', gap: '40px', marginTop: '20px', flexWrap: 'wrap' }}>
-        
+
         {/* Left Side: Product Visual Box */}
         <div style={{ flex: '1 1 450px', background: '#fff', padding: '20px', borderRadius: '8px', display: 'flex', justifyContent: 'center', alignItems: 'center', border: '1px solid var(--border)' }}>
-          <img 
-            src={product.image || '/placeholder-pc.png'} 
-            alt={product.name} 
-            style={{ maxWidth: '100%', maxHeight: '400px', objectFit: 'contain' }} 
+          <img
+            src={product.image || '/placeholder-pc.png'}
+            alt={product.name}
+            style={{ maxWidth: '100%', maxHeight: '400px', objectFit: 'contain' }}
           />
         </div>
 
@@ -149,6 +147,15 @@ export default function ProductDetailsPage() {
                 {product.specs.graphics && (
                   <div><strong style={{ color: 'var(--t3)' }}>Graphics:</strong> <span style={{ color: 'var(--t1)' }}>{product.specs.graphics}</span></div>
                 )}
+                {product.specs.display && (
+                  <div><strong style={{ color: 'var(--t3)' }}>Display:</strong> <span style={{ color: 'var(--t1)' }}>{product.specs.display}</span></div>
+                )}
+                {product.specs.battery && (
+                  <div><strong style={{ color: 'var(--t3)' }}>Battery:</strong> <span style={{ color: 'var(--t1)' }}>{product.specs.battery}</span></div>
+                )}
+                {product.specs.weight && (
+                  <div><strong style={{ color: 'var(--t3)' }}>Weight:</strong> <span style={{ color: 'var(--t1)' }}>{product.specs.weight}</span></div>
+                )}
                 {product.specs.cooler && (
                   <div style={{ gridColumn: '1 / -1' }}><strong style={{ color: 'var(--t3)' }}>Thermal System:</strong> <span style={{ color: 'var(--t1)' }}>{product.specs.cooler}</span></div>
                 )}
@@ -160,26 +167,18 @@ export default function ProductDetailsPage() {
 
           {/* User Interactivity Row */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap', marginTop: '10px' }}>
-            {!isOutOfStock && !(product.isPcBuilderTemplate || product.category === 'custom-pc-builds') && (
-              <div style={{ display: 'flex', alignItems: 'center', border: '1px solid var(--border)', borderRadius: '4px' }}>
-                <button onClick={() => setQty(q => Math.max(1, q - 1))} style={{ padding: '8px 16px', border: 'none', background: 'none', cursor: 'pointer' }}>-</button>
-                <span style={{ padding: '0 12px', fontWeight: 'bold' }}>{qty}</span>
-                <button onClick={() => setQty(q => q + 1)} style={{ padding: '8px 16px', border: 'none', background: 'none', cursor: 'pointer' }}>+</button>
-              </div>
-            )}
-
-            <button 
-              type="button" 
-              className="ncall" 
-              onClick={handleActionClick}
+            <button
+              type="button"
+              className="ncall"
+              onClick={handleCompareClick}
               style={{ padding: '12px 30px', fontSize: '16px', minWidth: '200px', justifyContent: 'center', animation: 'none' }}
             >
-              {isOutOfStock ? '✉ Inquire Anyway' : (product.isPcBuilderTemplate || product.category === 'custom-pc-builds') ? '🛠 Configure Build' : '🛒 Add to Cart'}
+              {comparing ? '✕ Remove from Compare' : '⇄ Add to Compare'}
             </button>
           </div>
-          
+
           <div style={{ marginTop: '10px', fontSize: '13px', color: isOutOfStock ? 'var(--red)' : 'var(--green)' }}>
-            ● {isOutOfStock ? 'Out of Stock' : 'Item is In Stock & ready to ship'}
+            ● {isOutOfStock ? 'Out of Stock' : 'Item is In Stock'}
           </div>
         </div>
       </div>

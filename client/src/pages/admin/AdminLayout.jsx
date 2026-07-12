@@ -2,20 +2,15 @@ import { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo.png';
 import { useAuth } from '../../context/AuthContext';
-import { useInquiries } from '../../context/InquiryContext';
 import { useTheme } from '../../context/ThemeContext';
 
 const TABS = [
-  { to: '/admin',             label: 'Dashboard',     icon: '📊', end: true },
-  { to: '/admin/products',   label: 'Products',      icon: '📦' },
-  
-  { to: '/admin/inquiries',  label: 'Inquiries',     icon: '✉️' },
-  { to: '/admin/customers',  label: 'Customers',     icon: '👤' },
+  { to: '/admin',             label: 'Dashboard', icon: '📊', end: true },
+  { to: '/admin/products',    label: 'Products',  icon: '📦' },
 ];
 
 export default function AdminLayout() {
   const { adminLogout, admin } = useAuth();
-  const { newCount } = useInquiries();
   const { toggleTheme } = useTheme();
   const navigate = useNavigate();
   
@@ -107,11 +102,6 @@ export default function AdminLayout() {
               >
                 <span className="text-base">{t.icon}</span>
                 <span>{t.label}</span>
-                {t.to === '/admin/inquiries' && newCount > 0 && (
-                  <span className={`ml-auto text-[10px] font-bold rounded-full px-2 py-0.5 bg-red-500 text-white`}>
-                    {newCount}
-                  </span>
-                )}
               </NavLink>
             ))}
           </nav>

@@ -1,4 +1,5 @@
 import { NavLink, useLocation } from 'react-router-dom';
+import { X, Flame, Headphones, Wrench } from 'lucide-react';
 import { categories } from '../data/categories';
 import { brands } from '../data/brands';
 import { useDrawer } from '../context/DrawerContext';
@@ -48,21 +49,22 @@ export default function Sidebar() {
             color: 'var(--t1)',
           }}
           onClick={closeAll}
+          aria-label="Close menu"
         >
-          &times;
+          <X size={20} strokeWidth={2} />
         </button>
       </div>
 
       <div>
         <h3 className="sb-title">Quick Links</h3>
         <NavLink to="/deals" className={({ isActive }) => `sb-link ${isActive ? 'active' : ''}`} onClick={closeAll}>
-          🔥 Today's Deals
+          <Flame size={15} strokeWidth={2} style={{ marginRight: 6, verticalAlign: -2 }} /> Today's Deals
         </NavLink>
         <NavLink to="/accessories" className={({ isActive }) => `sb-link ${isActive ? 'active' : ''}`} onClick={closeAll}>
-          🎧 Accessories
+          <Headphones size={15} strokeWidth={2} style={{ marginRight: 6, verticalAlign: -2 }} /> Accessories
         </NavLink>
         <NavLink to="/services" className={({ isActive }) => `sb-link ${isActive ? 'active' : ''}`} onClick={closeAll}>
-          🔧 Services
+          <Wrench size={15} strokeWidth={2} style={{ marginRight: 6, verticalAlign: -2 }} /> Services
         </NavLink>
       </div>
 

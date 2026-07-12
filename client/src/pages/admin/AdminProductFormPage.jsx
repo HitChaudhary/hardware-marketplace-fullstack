@@ -31,7 +31,6 @@ export default function AdminProductFormPage() {
   const existing = isEdit ? getProduct(id) : null;
 
   // Form State Definition matching the Mongoose Schema parameters completely
-// Form State Definition (FIXED SPACE BUG)
   const [form, setForm] = useState({
     name: '',
     slug: '',
@@ -41,7 +40,7 @@ export default function AdminProductFormPage() {
     oldPrice: '',
     badge: '',
     image: '',
-    description: '', 
+    description: '',
     featured: false,
     inStock: true,
     stockQty: '',
@@ -50,6 +49,9 @@ export default function AdminProductFormPage() {
       storage: '',
       processor: '',
       graphics: '',
+      display: '',
+      battery: '',
+      weight: '',
       cooler: ''
     }
   });
@@ -79,6 +81,9 @@ export default function AdminProductFormPage() {
           storage: existing.specs?.storage || '',
           processor: existing.specs?.processor || '',
           graphics: existing.specs?.graphics || '',
+          display: existing.specs?.display || '',
+          battery: existing.specs?.battery || '',
+          weight: existing.specs?.weight || '',
           cooler: existing.specs?.cooler || ''
         }
       });
@@ -175,10 +180,6 @@ export default function AdminProductFormPage() {
 
     const payload = {
       ...form,
-      name: form.name.trim(),
-      slug: form.slug.trim(),
-      brand: form.brand.trim(),
-      description: form.description?.trim() || '', 
       specs: cleanedSpecs
     };
 
@@ -291,6 +292,18 @@ export default function AdminProductFormPage() {
                   <div className="space-y-1.5">
                     <label className="text-[11px] font-bold uppercase text-t3">Graphics Controller (GPU)</label>
                     <input className={inputCls} placeholder="e.g. NVIDIA RTX 4060 8GB (140W)" value={form.specs.graphics} onChange={setSpec('graphics')} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-bold uppercase text-t3">Display</label>
+                    <input className={inputCls} placeholder="e.g. 15.6&quot; FHD IPS 144Hz" value={form.specs.display} onChange={setSpec('display')} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-bold uppercase text-t3">Battery</label>
+                    <input className={inputCls} placeholder="e.g. 4-Cell, up to 10 hrs" value={form.specs.battery} onChange={setSpec('battery')} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-bold uppercase text-t3">Weight</label>
+                    <input className={inputCls} placeholder="e.g. 1.69 kg" value={form.specs.weight} onChange={setSpec('weight')} />
                   </div>
                   <div className="space-y-1.5 sm:col-span-2">
                     <label className="text-[11px] font-bold uppercase text-t3">Cooling Solution / Thermal System (Optional)</label>

@@ -2,8 +2,6 @@ import Announce from './Announce';
 import Sidebar from './Sidebar';
 import Navbar from './Navbar';
 import Footer from './Footer';
-import CartDrawer from './CartDrawer';
-import ConfiguratorDrawer from './ConfiguratorDrawer';
 import Overlay from './Overlay';
 import PageTransition from './PageTransition';
 import { ScrollRestoration, ScrollToTopButton } from './ScrollToTop';
@@ -16,16 +14,13 @@ export default function Layout() {
       <Announce />
 
       <div className="main-wrapper">
-        <Sidebar  />
+        <Sidebar />
 
         <div className="main-content">
           <Navbar />
           <PageTransition />
           <Footer />
         </div>
-
-        <CartDrawer />
-        <ConfiguratorDrawer />
       </div>
 
       <ScrollToTopButton />
