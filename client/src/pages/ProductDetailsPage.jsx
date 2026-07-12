@@ -21,6 +21,10 @@ export default function ProductDetailsPage() {
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  
+  const API_BASE_URL = window.location.hostname === 'localhost' 
+  ? 'http://localhost:5000' 
+  : 'https://hardware-marketplace-fullstack.onrender.com';
 
   useEffect(() => {
     async function fetchProductDetails() {
