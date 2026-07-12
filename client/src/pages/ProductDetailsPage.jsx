@@ -8,6 +8,11 @@ import { getRating, getReviewCount } from '../utils/productMeta';
 
 const formatPrice = (n) => `₹${n?.toLocaleString('en-IN')}`;
 
+// Define your backend Render destination domain absolute URL prefix
+const API_BASE_URL = window.location.hostname === 'localhost' 
+  ? '' 
+  : 'https://your-backend-app.onrender.com'; // Replace with your actual live Render link
+
 export default function ProductDetailsPage() {
   const { idOrSlug } = useParams();
   const navigate = useNavigate();
@@ -21,7 +26,8 @@ export default function ProductDetailsPage() {
     async function fetchProductDetails() {
       try {
         setLoading(true);
-        const res = await fetch(`/products/${idOrSlug}`);
+        // Clean absolute string layout path prevents HTML 404 proxy loops from throwing parsing exceptions
+        const res = await fetch(`${API_BASE_URL}/api/products/${idOrSlug}`);
         if (res.ok) {
           const payload = await res.json();
 
@@ -36,9 +42,13 @@ export default function ProductDetailsPage() {
               console.error("Product fields not found in API response structure:", payload);
             }
           }
+        } else {
+          console.error("Server responded with error payload status code.");
+          setProduct(null);
         }
       } catch (err) {
         console.error("Error reading details from database:", err);
+        setProduct(null);
       } finally {
         setLoading(false);
       }
@@ -78,7 +88,7 @@ export default function ProductDetailsPage() {
   const isOutOfStock = product.inStock === false || product.stockQty <= 0;
   const comparing = isComparing(productId);
 
-  // Derive if there are any readable specs available inside the mixed object block
+  // Evaluates if there are active dynamic specification pairs present inside the object
   const hasSpecs = product.specs && Object.keys(product.specs).some(key => product.specs[key]);
 
   const handleCompareClick = () => {
@@ -128,37 +138,34 @@ export default function ProductDetailsPage() {
             {product.description || "High-performance hardware component verified for elite speed and reliability matrix compliance."}
           </div>
 
-          {/* Dynamic Technical Specs Sheet Layout Rendering Block */}
+          {/* Dynamic Technical Specs Sheet Layout - Automatically handles ANY properties saved inside Mongoose Mixed Schema */}
           {hasSpecs && (
             <div style={{ backgroundColor: 'var(--s1, #f8fafc)', border: '1px solid var(--border)', borderRadius: '8px', padding: '15px', marginTop: '5px' }}>
-              <h4 style={{ margin: '0 0 10px 0', fontSize: '12px', uppercase: 'true', letterSpacing: '0.05em', color: 'var(--primary)' }}>
+              <h4 style={{ margin: '0 0 10px 0', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--primary)' }}>
                 📋 Technical Specifications
               </h4>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '10px', fontSize: '13px' }}>
-                {product.specs.processor && (
-                  <div><strong style={{ color: 'var(--t3)' }}>CPU:</strong> <span style={{ color: 'var(--t1)' }}>{product.specs.processor}</span></div>
-                )}
-                {product.specs.ram && (
-                  <div><strong style={{ color: 'var(--t3)' }}>Memory:</strong> <span style={{ color: 'var(--t1)' }}>{product.specs.ram}</span></div>
-                )}
-                {product.specs.storage && (
-                  <div><strong style={{ color: 'var(--t3)' }}>Storage:</strong> <span style={{ color: 'var(--t1)' }}>{product.specs.storage}</span></div>
-                )}
-                {product.specs.graphics && (
-                  <div><strong style={{ color: 'var(--t3)' }}>Graphics:</strong> <span style={{ color: 'var(--t1)' }}>{product.specs.graphics}</span></div>
-                )}
-                {product.specs.display && (
-                  <div><strong style={{ color: 'var(--t3)' }}>Display:</strong> <span style={{ color: 'var(--t1)' }}>{product.specs.display}</span></div>
-                )}
-                {product.specs.battery && (
-                  <div><strong style={{ color: 'var(--t3)' }}>Battery:</strong> <span style={{ color: 'var(--t1)' }}>{product.specs.battery}</span></div>
-                )}
-                {product.specs.weight && (
-                  <div><strong style={{ color: 'var(--t3)' }}>Weight:</strong> <span style={{ color: 'var(--t1)' }}>{product.specs.weight}</span></div>
-                )}
-                {product.specs.cooler && (
-                  <div style={{ gridColumn: '1 / -1' }}><strong style={{ color: 'var(--t3)' }}>Thermal System:</strong> <span style={{ color: 'var(--t1)' }}>{product.specs.cooler}</span></div>
-                )}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '12px', fontSize: '13px' }}>
+                {Object.entries(product.specs).map(([key, value]) => {
+                  if (!value) return null;
+                  
+                  // Format label names nicely (e.g. processor -> Processor, batteryLife -> Battery Life)
+                  const formattedKey = key
+                    .replace(/([A-Z])/g, ' $1')
+                    .replace(/^./, (str) => str.toUpperCase());
+                  
+                  // Make generic long values like custom cooling systems span columns elegantly
+                  const isLongValue = value.toString().length > 30 || key === 'cooler' || key === 'thermalSystem';
+                  
+                  return (
+                    <div 
+                      key={key} 
+                      style={isLongValue ? { gridColumn: '1 / -1' } : {}}
+                    >
+                      <strong style={{ color: 'var(--t3)', textTransform: 'capitalize' }}>{formattedKey}:</strong>{' '}
+                      <span style={{ color: 'var(--t1)' }}>{value.toString()}</span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
