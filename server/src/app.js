@@ -10,12 +10,17 @@ import { notFound, errorHandler } from './middleware/errorHandler.js';
 
 const app = express();
 
-app.use(
-  cors({
-    origin: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
-    credentials: true,
-  })
-);
+app.use(cors({
+  origin: [
+    'https://akcomputersfrontend-iota.vercel.app', // Your live Vercel domain
+    'http://localhost:5173',                       // Local Vite testing server port
+    'http://localhost:3000'                        // Alternate local web server port
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
+
 app.use(express.json());
 app.use(cookieParser());
 if (process.env.NODE_ENV !== 'test') {
