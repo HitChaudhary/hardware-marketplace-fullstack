@@ -14,7 +14,7 @@ export const uploadFile = async (filePath) => {
     try {
         const result = await cloudinary.uploader.upload(filePath, {
             resource_type: "auto", 
-            folder: "video_playlist_assets" 
+            folder: "ak computers" 
         });
 
         console.log("Upload Success URL:", result.secure_url);
