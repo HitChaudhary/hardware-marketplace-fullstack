@@ -16,7 +16,6 @@ const productSchema = new mongoose.Schema(
     specs: { type: mongoose.Schema.Types.Mixed, default: {} }, // Handles flexible nested fields like RAM, Storage, CPU, etc.
     inStock: { type: Boolean, default: true },
     stockQty: { type: Number, default: 10 },
-    isDeleted: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

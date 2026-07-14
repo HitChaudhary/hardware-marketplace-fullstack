@@ -63,7 +63,7 @@ router.post(
 router.get('/', async (req, res, next) => {
   try {
     const { category, brand, q, featured } = req.query;
-    const filter = { isDeleted: { $ne: true } };
+    const filter = {};
 
     if (category) filter.category = category;
     if (brand) filter.brand = brand;
@@ -85,8 +85,8 @@ router.get('/:slug', async (req, res, next) => {
     const { slug } = req.params;
     const isObjectId = /^[0-9a-fA-F]{24}$/.test(slug);
     const query = isObjectId
-      ? { $or: [{ slug }, { _id: slug }], isDeleted: { $ne: true } }
-      : { slug, isDeleted: { $ne: true } };
+      ? { $or: [{ slug }, { _id: slug }] }
+      : { slug };
     const product = await Product.findOne(query);
     if (!product) return res.status(404).json({ message: 'Product not found.' });
     res.json({ product });
@@ -134,14 +134,10 @@ router.put('/:id', protectAdmin, async (req, res, next) => {
   }
 });
 
-// DELETE /api/products/:id — admin only (soft delete)
+// DELETE /api/products/:id — admin only (permanently removes the document)
 router.delete('/:id', protectAdmin, async (req, res, next) => {
   try {
-    const product = await Product.findByIdAndUpdate(
-      req.params.id,
-      { isDeleted: true },
-      { new: true }
-    );
+    const product = await Product.findByIdAndDelete(req.params.id);
     if (!product) return res.status(404).json({ message: 'Product not found.' });
     res.json({ message: 'Product deleted.' });
   } catch (err) {

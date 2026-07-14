@@ -38,11 +38,14 @@ export function ProductStoreProvider({ children }) {
   // 2. Dispatch product parameters to your server using POST endpoints
   const addProduct = async (formData) => {
     try {
-      // Automatically construct a slug parameters match if missing in state
-      const slugified = formData.name
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/(^-|-$)+/g, '');
+      // Only auto-generate a slug when the admin left the field blank —
+      // otherwise respect whatever unique slug they typed in the form.
+      const slugified = (formData.slug && formData.slug.trim())
+        ? formData.slug.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')
+        : formData.name
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/(^-|-$)+/g, '');
 
       const payload = {
   name: formData.name,
@@ -123,7 +126,7 @@ export function ProductStoreProvider({ children }) {
     }
   };
 
-  // 4. Trigger soft deletion flags across database schemas using DELETE endpoints
+  // 4. Permanently remove a product document via the DELETE endpoint
   const deleteProduct = async (id) => {
     try {
       const targetProduct = products.find((p) => p.id === id || p._id === id);
@@ -137,7 +140,7 @@ export function ProductStoreProvider({ children }) {
       // Erase item out of active rendering hooks instantly
       setProducts((prev) => prev.filter((p) => p._id !== dbId && p.id !== id));
     } catch (err) {
-      console.error('Failed to soft delete document from collection:', err);
+      console.error('Failed to delete document from collection:', err);
       throw new Error(err.message || 'Could not delete product record.');
     }
   };
@@ -145,7 +148,7 @@ export function ProductStoreProvider({ children }) {
   // 5. Dynamic Stock resolution directly reading MongoDB schema outputs
   const getStock = (product) => {
     if (!product) return 'out';
-    if (product.inStock === false || product.isDeleted === true) return 'out';
+    if (product.inStock === false) return 'out';
     if (product.stockQty !== undefined) {
       if (product.stockQty <= 0) return 'out';
       if (product.stockQty <= 4) return 'low';
@@ -156,7 +159,7 @@ export function ProductStoreProvider({ children }) {
 
   const getStockQty = (product) => {
     if (!product) return 0;
-    if (product.inStock === false || product.isDeleted === true) return 0;
+    if (product.inStock === false) return 0;
     if (product.stockQty !== undefined) return product.stockQty;
     return 10; // Default safety fallback boundary metric
   };
