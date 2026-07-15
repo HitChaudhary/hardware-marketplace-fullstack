@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom';
+import { MessageCircle } from 'lucide-react';
 import { useCompare } from '../context/CompareContext';
 import { useToast } from '../context/ToastContext';
 import RatingStars from './RatingStars';
 import { getRating, getReviewCount, getStock } from '../utils/productMeta';
+import { getWhatsappPriceLink } from '../utils/whatsapp';
 
 const BADGE_LABELS = {
   sale: 'Sale',
@@ -11,10 +13,8 @@ const BADGE_LABELS = {
   hot: 'Hot',
 };
 
-const formatPrice = (n) => `₹${n.toLocaleString('en-IN')}`;
-
 export default function ProductCard({ product }) {
-  const { brand, name, price, oldPrice, badge, image } = product;
+  const { brand, name, badge, image } = product;
   const { isComparing, toggleCompare } = useCompare();
   const { showToast } = useToast();
 
@@ -60,11 +60,16 @@ export default function ProductCard({ product }) {
           <RatingStars rating={getRating(product)} count={getReviewCount(product)} size={11} />
         </div>
         <div className="pcard-bot-action">
-          <div className="pprice">
-            <span className="pnew">{formatPrice(price)}</span>
-            {oldPrice && <span className="pold">{formatPrice(oldPrice)}</span>}
-          </div>
-          <Link to={`/product/${routeTarget}`} className="padd" style={{ textDecoration: 'none', textAlign: 'center' }}>
+          <a
+            href={getWhatsappPriceLink(product)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="padd"
+            style={{ textDecoration: 'none', background: '#25D366', color: '#fff', borderColor: '#25D366' }}
+          >
+            <MessageCircle size={14} strokeWidth={2} /> Check Price
+          </a>
+          <Link to={`/product/${routeTarget}`} className="padd" style={{ textDecoration: 'none' }}>
             {stock === 'out' ? 'Out of Stock' : 'View'}
           </Link>
         </div>

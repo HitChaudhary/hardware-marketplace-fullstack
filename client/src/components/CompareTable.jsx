@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
+import { MessageCircle } from 'lucide-react';
 import { getSpecs } from '../utils/productMeta';
-import { formatPrice } from './PriceBox';
+import { getWhatsappPriceLink } from '../utils/whatsapp';
 
 const ROWS = [
   { label: 'CPU', key: 'Processor' },
@@ -51,7 +52,20 @@ export default function CompareTable({ products, onRemove }) {
           <tr>
             <th>Price</th>
             {products.map((p) => (
-              <td key={p._id || p.id} className="compare-price">{formatPrice(p.price)}</td>
+              <td key={p._id || p.id}>
+                <a
+                  href={getWhatsappPriceLink(p)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 6,
+                    background: '#25D366', color: '#fff', padding: '8px 12px',
+                    borderRadius: 6, fontWeight: 600, fontSize: 13, textDecoration: 'none',
+                  }}
+                >
+                  <MessageCircle size={14} strokeWidth={2} /> Check Price
+                </a>
+              </td>
             ))}
           </tr>
         </tbody>

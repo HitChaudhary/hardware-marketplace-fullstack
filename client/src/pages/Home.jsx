@@ -12,11 +12,20 @@ export default function Home() {
       <HeroSlider />
       <TrustBar />
 
+      {featured.length > 0 && (
+        <main className="sec a3">
+          <div className="sec-head">
+            <h3 className="sec-title">Featured Collections</h3>
+          </div>
+          {loading ? <p>Loading products…</p> : <ProductGrid products={featured} />}
+        </main>
+      )}
+
       <main className="sec a3">
         <div className="sec-head">
-          <h3 className="sec-title">Featured Collections</h3>
+          <h3 className="sec-title">All Products</h3>
         </div>
-        {loading ? <p>Loading products…</p> : <ProductGrid products={featured} />}
+        {loading ? <p>Loading products…</p> : <ProductGrid products={products} />}
       </main>
     </>
   );

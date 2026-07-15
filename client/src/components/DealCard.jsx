@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
-import { formatPrice } from './PriceBox';
+import { MessageCircle } from 'lucide-react';
+import { getWhatsappPriceLink } from '../utils/whatsapp';
 
 export default function DealCard({ product }) {
   // Backend product lookup route only matches by slug, so prefer slug
@@ -18,11 +19,16 @@ export default function DealCard({ product }) {
           <h4 className="pname">{product.name}</h4>
         </div>
         <div className="pcard-bot-action">
-          <div className="pprice">
-            <span className="pnew">{formatPrice(product.price)}</span>
-            <span className="pold">{formatPrice(product.oldPrice)}</span>
-          </div>
-          <Link to={`/product/${routeTarget}`} className="padd" style={{ textDecoration: 'none', textAlign: 'center' }}>
+          <a
+            href={getWhatsappPriceLink(product)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="padd"
+            style={{ textDecoration: 'none', background: '#25D366', color: '#fff', borderColor: '#25D366' }}
+          >
+            <MessageCircle size={14} strokeWidth={2} /> Check Price
+          </a>
+          <Link to={`/product/${routeTarget}`} className="padd" style={{ textDecoration: 'none' }}>
             View
           </Link>
         </div>

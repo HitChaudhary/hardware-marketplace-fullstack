@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { MessageCircle } from 'lucide-react';
 import Breadcrumb from '../components/Breadcrumb';
 import RatingStars from '../components/RatingStars';
 import { useCompare } from '../context/CompareContext';
 import { useToast } from '../context/ToastContext';
 import { getRating, getReviewCount } from '../utils/productMeta';
-
-const formatPrice = (n) => `₹${n?.toLocaleString('en-IN')}`;
+import { getWhatsappPriceLink } from '../utils/whatsapp';
 
 // Define your backend Render destination domain absolute URL prefix
 const API_BASE_URL = window.location.hostname === 'localhost' 
@@ -129,14 +129,18 @@ export default function ProductDetailsPage() {
 
           <hr style={{ border: '0', borderTop: '1px solid var(--border)' }} />
 
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: '15px' }}>
-            <span className="pnew" style={{ fontSize: '28px', fontWeight: 'bold', color: 'var(--primary)' }}>{formatPrice(product.price)}</span>
-            {product.oldPrice && (
-              <span className="pold" style={{ textDecoration: 'line-through', color: 'var(--t3)', fontSize: '18px' }}>
-                {formatPrice(product.oldPrice)}
-              </span>
-            )}
-          </div>
+          <a
+            href={getWhatsappPriceLink(product)}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 10,
+              background: '#25D366', color: '#fff', padding: '12px 20px',
+              borderRadius: 8, fontWeight: 700, fontSize: 15, textDecoration: 'none', width: 'fit-content',
+            }}
+          >
+            <MessageCircle size={18} strokeWidth={2} /> Check Price on WhatsApp
+          </a>
 
           <div style={{ color: 'var(--t2)', fontSize: '14px', lineHeight: '1.6' }}>
             {product.description || "High-performance hardware component verified for elite speed and reliability matrix compliance."}
