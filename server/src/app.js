@@ -13,7 +13,7 @@ const app = express();
 app.use(cors({
   origin: [
     'https://akcomputersfrontend-iota.vercel.app',
-    'https://hardware-marketplace-fullstack-zzur.onrender.com/', // Your live Vercel domain
+    'https://hardware-marketplace-fullstack-zzur.onrender.com', // Your live Vercel domain
     'http://localhost:5173',                       // Local Vite testing server port
     'http://localhost:3000'                        // Alternate local web server port
   ],
